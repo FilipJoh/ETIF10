@@ -43,33 +43,149 @@ orderSampling = kaiserord( [2000 2500], [1 0], [0.005 0.005], 20000 )
 orderRipple = kaiserord( [2000 2500], [1 0], [0.002 0.002], 10000 )
 orderEdge = kaiserord( [2300 2500], [1 0], [0.005 0.005], 10000 )
 %% T1.8
-extra=10;
-LpFilterHAM=fir1(orderLP+extra,2.25/5);
-fvtool(LpFilterHAM)
-
-
-%[H,w]=freqz(LpFilterHAM,1, 'whole');
-%figure;
-%plot(w(1:end/2),abs(H(1:end/2)));
+passbandFreq = 2 / 10;
+stopbandFreq = 2.5 / 10;
+cutFreq = (passbandFreq + stopbandFreq) / 2;
+passRipple = 0.005;
+stopRipple = 0.005;
+order = orderLP;
+while (1)
+    LpFilterHAM=fir1(order,cutFreq*2);
+    [H,w]=freqz(LpFilterHAM,1,1000, 'whole');
+    H = abs(H);
+    f = w / 2 / pi;
+    if ((max(abs(1 - H(1:201))) < passRipple) && (max(abs(H(251:500))) < stopRipple))
+        break        
+    else
+        order = order + 1;
+    end
+end
+finalorderHamming = order
+figure;
+plot(f(1:end/2),H(1:end/2),'.');
+xlabel('Normalized frequency')
+ylabel('Magnitude response')
 
 %% T.9
-extraHan=12;
-LpFilterHan=fir1(orderLP+extraHan,2.25/5,hann(orderLP+extraHan+1));
-fvtool(LpFilterHan)
+passbandFreq = 2 / 10;
+stopbandFreq = 2.5 / 10;
+cutFreq = (passbandFreq + stopbandFreq) / 2;
+passRipple = 0.005;
+stopRipple = 0.005;
+order = orderLP;
+while (1)
+    LpFilterHAN=fir1(order,cutFreq*2,hann(order+1));
+    [H,w]=freqz(LpFilterHAN,1,1000, 'whole');
+    H = abs(H);
+    f = w / 2 / pi;
+    if ((max(abs(1 - H(1:201))) < passRipple) && (max(abs(H(251:500))) < stopRipple))
+        break        
+    else
+        order = order + 1;
+    end
+end
+finalorderHanning = order
+figure;
+plot(f(1:end/2),H(1:end/2),'.');
+xlabel('Normalized frequency')
+ylabel('Magnitude response')
+
 %%
-extraRek=0;
-LpFilterHan=fir1(orderLP+extraRek,2.25/5,rectwin(orderLP+extraRek+1));
-fvtool(LpFilterHan)
+passbandFreq = 2 / 10;
+stopbandFreq = 2.5 / 10;
+cutFreq = (passbandFreq + stopbandFreq) / 2;
+passRipple = 0.005;
+stopRipple = 0.005;
+order = orderLP;
+while (1)
+    LpFilterREC=fir1(order,cutFreq*2,rectwin(order+1));
+    [H,w]=freqz(LpFilterREC,1,1000, 'whole');
+    H = abs(H);
+    f = w / 2 / pi;
+    if ((max(abs(1 - H(1:201))) < passRipple) && (max(abs(H(251:500))) < stopRipple))
+        break        
+    else
+        order = order + 1;
+    end
+end
+finalorderRectangle = order
+figure;
+plot(f(1:end/2),H(1:end/2),'.');
+xlabel('Normalized frequency')
+ylabel('Magnitude response')
 
 %% T1.10 fir2
-extra=0;
-f=[0 2.0/5.0 2.5/5.0 1];
-a=[1 1 0 0];
-LpFilterfreq=fir2(orderLP+extra,f,a);
-fvtool(LpFilterfreq)
+passbandFreq = 2 / 10;
+stopbandFreq = 2.5 / 10;
+cutFreq = (passbandFreq + stopbandFreq) / 2;
+passRipple = 0.005;
+stopRipple = 0.005;
+fr=[0 cutFreq*2 cutFreq*2 1];
+amp=[1 1 0 0];
+order = orderLP;
+while (1)
+    LpFilterFreq=fir2(order,fr,amp);
+    [H,w]=freqz(LpFilterFreq,1,1000, 'whole');
+    H = abs(H);
+    f = w / 2 / pi;
+    if ((max(abs(1 - H(1:201))) < passRipple) && (max(abs(H(251:500))) < stopRipple))
+        break        
+    else
+        order = order + 1;
+    end
+end
+finalorder = order
+figure;
+plot(fr/2, amp, f(1:end/2), H(1:end/2),'.');
+lgs = {'Ideal','fir2 default'};
+legend(lgs)
+xlabel('Normalized frequency')
+ylabel('Magnitude response')
 
 %% firpm
-pmextra=0;
-LpFilterPM=firpm(orderLP+pmextra,f,a);
-fvtool(LpFilterPM)
+passbandFreq = 2 / 10;
+stopbandFreq = 2.5 / 10;
+cutFreq = (passbandFreq + stopbandFreq) / 2;
+passRipple = 0.005;
+stopRipple = 0.005;
+fr=[0 passbandFreq*2 stopbandFreq*2 1];
+amp=[1 1 0 0];
+order = orderLP;
+while (1)
+    LpFilterPM=firpm(order,fr,amp);
+    [H,w]=freqz(LpFilterPM,1,1000, 'whole');
+    H = abs(H);
+    f = w / 2 / pi;
+    if ((max(abs(1 - H(1:201))) < passRipple) && (max(abs(H(251:500))) < stopRipple))
+        order = order - 1;     
+    else
+        order = order + 1;
+        break
+    end
+end
+LpFilterPM=firpm(order,fr,amp);
+[H,w]=freqz(LpFilterPM,1,1000, 'whole');
+H = abs(H);
+f = w / 2 / pi;
+finalorder = order
+figure;
+plot(f(1:end/2),H(1:end/2),'.');
+xlabel('Normalized frequency')
+ylabel('Magnitude response')
 
+%% T1.11
+
+%% Phase Hamming
+fvtool(LpFilterHAM);
+
+%% Phase Hanning
+fvtool(LpFilterHAN);
+
+%% Phase Rectangle
+fvtool(LpFilterREC);
+
+%% Phase frequency sampling
+fvtool(LpFilterFreq);
+
+%% Phase PM
+fvtool(LpFilterPM);
