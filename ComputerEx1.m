@@ -8,8 +8,8 @@ n=1:N(selector);
 
 h=wc*sin(wc*(n-(N(selector)-1)/2))./(pi.*(n-(N(selector)-1)/2));
 h((N(selector)-1)/2)=wc/pi;
- figure;
- plot(n,h);
+figure;
+plot(n,h);
 
 [H,w]=freqz(h,1, 'whole');
 figure;
@@ -43,9 +43,14 @@ orderSampling = kaiserord( [2000 2500], [1 0], [0.005 0.005], 20000 )
 orderRipple = kaiserord( [2000 2500], [1 0], [0.002 0.002], 10000 )
 orderEdge = kaiserord( [2300 2500], [1 0], [0.005 0.005], 10000 )
 %% T1.8
-extra=16;
+extra=10;
 LpFilterHAM=fir1(orderLP+extra,2.25/5);
 fvtool(LpFilterHAM)
+
+
+%[H,w]=freqz(LpFilterHAM,1, 'whole');
+%figure;
+%plot(w(1:end/2),abs(H(1:end/2)));
 
 %% T.9
 extraHan=12;

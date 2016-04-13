@@ -1,2 +1,6 @@
 # Images
+images
 *.eps
+
+# Active scrpits
+*.asv
