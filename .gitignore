@@ -4,3 +4,8 @@ images
 
 # Active scrpits
 *.asv
+
+#zip files
+*.zip
+ComputerExe2/
+*.txt
